@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Meine Plugs{% endblock %}
+
+{% block body %}
+    <main class="container py-5">
+        <header class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+            <div>
+                <p class="text-uppercase text-primary fw-semibold small mb-2">Homemon · Geräte</p>
+                <h1 class="h2 mb-1">Meine Plugs</h1>
+                <p class="text-secondary mb-0">Shelly Plugs verwalten und Verbindungsadressen aktuell halten.</p>
+            </div>
+            <a class="btn btn-primary" href="{{ path('plug_new') }}">Plug hinzufügen</a>
+        </header>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success" role="status">{{ message }}</div>
+        {% endfor %}
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger" role="alert">{{ message }}</div>
+        {% endfor %}
+
+        {% if plugs is empty %}
+            <section class="empty-state text-center p-5 rounded-4">
+                <div class="plug-icon mx-auto mb-3" aria-hidden="true">⌁</div>
+                <h2 class="h5">Noch keine Plugs angelegt</h2>
+                <p class="text-secondary mb-4">Füge deinen ersten Shelly Plug hinzu, um ihn hier zu verwalten.</p>
+                <a class="btn btn-primary" href="{{ path('plug_new') }}">Ersten Plug erstellen</a>
+            </section>
+        {% else %}
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h6 text-secondary mb-0">Geräte</h2>
+                <span class="badge text-bg-light">{{ plugs|length }} {{ plugs|length == 1 ? 'Plug' : 'Plugs' }}</span>
+            </div>
+            <div class="row g-3">
+                {% for plug in plugs %}
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <article class="plug-card h-100 p-4 rounded-4">
+                            <div class="d-flex justify-content-between align-items-start gap-3">
+                                <div class="plug-icon" aria-hidden="true">⌁</div>
+                                <a class="btn btn-sm btn-outline-secondary" href="{{ path('plug_edit', {id: plug.id}) }}">Bearbeiten</a>
+                            </div>
+                            <h3 class="h5 mt-4 mb-1">{{ plug.name }}</h3>
+                            <p class="text-secondary small mb-0">Hostname / IP-Adresse</p>
+                            <p class="plug-hostname mb-4">{{ plug.hostname }}</p>
+                            <form method="post" action="{{ path('plug_delete', {id: plug.id}) }}" onsubmit="return confirm('Möchtest du diesen Plug wirklich löschen?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ plug.id) }}">
+                                <button class="btn btn-sm btn-link text-danger p-0 text-decoration-none" type="submit">Plug löschen</button>
+                            </form>
+                        </article>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </main>
+{% endblock %}

@@ -6,6 +6,7 @@ use App\Repository\ShellyPlugRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ShellyPlugRepository::class)]
 class ShellyPlug
@@ -17,9 +18,13 @@ class ShellyPlug
     private ?Uuid $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Bitte gib einen Namen ein.')]
+    #[Assert\Length(max: 255, maxMessage: 'Der Name darf höchstens {{ limit }} Zeichen lang sein.')]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Bitte gib einen Hostnamen oder eine IP-Adresse ein.')]
+    #[Assert\Length(max: 255, maxMessage: 'Der Hostname darf höchstens {{ limit }} Zeichen lang sein.')]
     private ?string $hostname = null;
 
     public function getId(): ?Uuid
