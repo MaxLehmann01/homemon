@@ -16,14 +16,15 @@ final class ShellyPlugType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Name',
-                'attr' => ['placeholder' => 'z. B. Stehlampe Wohnzimmer'],
+                'attr' => ['placeholder' => 'e.g. Living room lamp'],
             ])
             ->add('hostname', TextType::class, [
-                'label' => 'Hostname oder IP-Adresse',
-                'attr' => ['placeholder' => 'z. B. shelly-wohnzimmer.local'],
+                'label' => 'Hostname',
+                'help' => 'Base URL including http:// or https://. Local hostnames and IP addresses are supported.',
+                'attr' => ['placeholder' => 'http://192.168.1.42'],
             ])
             ->add('save', SubmitType::class, [
-                'label' => $options['is_edit'] ? 'Änderungen speichern' : 'Plug erstellen',
+                'label' => $options['is_edit'] ? 'Save changes' : 'Add Plug',
                 'attr' => ['class' => 'btn btn-primary'],
             ]);
     }

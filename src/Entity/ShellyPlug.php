@@ -18,14 +18,28 @@ class ShellyPlug
     private ?Uuid $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: 'Bitte gib einen Namen ein.')]
-    #[Assert\Length(max: 255, maxMessage: 'Der Name darf höchstens {{ limit }} Zeichen lang sein.')]
+    #[Assert\NotBlank(message: 'Please enter a name.')]
+    #[Assert\Length(max: 255)]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: 'Bitte gib einen Hostnamen oder eine IP-Adresse ein.')]
-    #[Assert\Length(max: 255, maxMessage: 'Der Hostname darf höchstens {{ limit }} Zeichen lang sein.')]
+    #[Assert\NotBlank(message: 'Please enter a URL.')]
+    #[Assert\Length(max: 255)]
+    #[Assert\Url(protocols: ['http', 'https'], requireTld: false, message: 'Please enter a valid HTTP or HTTPS URL.')]
+    #[Assert\Regex(pattern: '~^https?://[^?#@]+$~i', message: 'Use a base URL without credentials, a query string or a fragment.')]
     private ?string $hostname = null;
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $status = null;
+
+    #[ORM\Column(type: 'json')]
+    private array $powerHistory = [];
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $checkedAt = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $collectionError = null;
 
     public function getId(): ?Uuid
     {
@@ -51,8 +65,45 @@ class ShellyPlug
 
     public function setHostname(string $hostname): static
     {
+        $hostname = rtrim(trim($hostname), '/');
+        if ($this->hostname !== $hostname) {
+            $this->status = null;
+            $this->powerHistory = [];
+            $this->checkedAt = null;
+            $this->collectionError = null;
+        }
         $this->hostname = $hostname;
 
         return $this;
+    }
+
+    public function getStatus(): ?array
+    {
+        return $this->status;
+    }
+
+    public function getPowerHistory(): array
+    {
+        return $this->powerHistory;
+    }
+
+    public function getCheckedAt(): ?\DateTimeImmutable
+    {
+        return $this->checkedAt;
+    }
+
+    public function getCollectionError(): ?string
+    {
+        return $this->collectionError;
+    }
+
+    public function recordReading(?array $status, \DateTimeImmutable $at, ?string $error = null): void
+    {
+        $this->status = $status;
+        $this->checkedAt = $at;
+        $this->collectionError = $error;
+        $this->powerHistory = array_values(array_filter($this->powerHistory, static fn (array $point): bool => $point['time'] > $at->getTimestamp() - 300));
+        $this->powerHistory[] = ['time' => $at->getTimestamp(), 'watts' => $status['apower'] ?? null];
+        $this->powerHistory = array_slice($this->powerHistory, -300);
     }
 }
