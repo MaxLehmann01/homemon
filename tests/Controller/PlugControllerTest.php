@@ -21,6 +21,8 @@ final class PlugControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $this->resetSchema();
+        $client->request('GET', '/login');
+        $client->submitForm('Sign in', ['password' => 'test-password']);
         $crawler = $client->request('GET', '/');
 
         self::assertResponseIsSuccessful();

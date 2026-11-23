@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sign in{% endblock %}
+
+{% block body %}
+    <main class="container py-5">
+        <section class="form-card mx-auto mt-5 p-4 p-sm-5 rounded-4">
+            <p class="text-primary text-uppercase fw-semibold small">Homemon · Energy monitoring</p>
+            <h1 class="h3">Welcome home</h1>
+            <p class="text-secondary">Enter your password to open your dashboard.</p>
+            {% if error %}<div class="alert alert-danger" role="alert">Sign-in failed. Check your password and try again.</div>{% endif %}
+            <form method="post" action="{{ path('app_login') }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                <label class="form-label" for="password">Password</label>
+                <input class="form-control mb-3" type="password" id="password" name="password" autocomplete="current-password" required autofocus>
+                <button class="btn btn-primary w-100" type="submit">Sign in</button>
+            </form>
+        </section>
+    </main>
+{% endblock %}
