@@ -1,0 +1,29 @@
+<article {{ attributes.defaults({class: 'plug-card rounded-4 p-4', 'data-poll': 'delay(1000)|$render'}) }}>
+    {% set status = plug.status %}
+    {% set stale = this.stale %}
+    <header class="d-flex justify-content-between align-items-start gap-3 mb-3">
+        <div>
+            <h3 class="h5 mb-1">{{ plug.name }}</h3>
+            <p class="plug-hostname small text-secondary mb-0">{{ plug.hostname }}</p>
+        </div>
+        <span class="badge {{ stale or plug.collectionError ? 'text-bg-warning' : 'text-bg-success' }}">
+            {{ stale ? (plug.checkedAt ? 'Stale' : 'Waiting') : (plug.collectionError ? 'Offline' : 'Live') }}
+        </span>
+    </header>
+    <p class="mb-0 text-secondary small">Current power</p>
+    <p class="power-value mb-3">{{ status and not stale ? status.apower|number_format(1, '.', ',') : '—' }} <span class="fs-5 text-secondary">W</span></p>
+    <div class="power-chart">{{ render_chart(chart, {id: 'power-chart-' ~ plug.id, 'aria-label': 'Power consumption in watts for ' ~ plug.name, role: 'img'}) }}</div>
+    {% if plug.collectionError %}
+        <p class="small text-danger mt-3 mb-0" role="status">{{ plug.collectionError }}</p>
+    {% elseif stale %}
+        <p class="small text-secondary mt-3 mb-0" role="status">{{ plug.checkedAt ? 'Readings are out of date. Check that the collector is running.' : 'Waiting for the first reading. Make sure the collector is running.' }}</p>
+    {% endif %}
+    <dl class="row small mt-3 mb-0 metrics">
+        <div class="col-6 col-sm-4"><dt>Voltage</dt><dd>{{ status and not stale ? status.voltage|number_format(1) ~ ' V' : '—' }}</dd></div>
+        <div class="col-6 col-sm-4"><dt>Current</dt><dd>{{ status and not stale ? status.current|number_format(3) ~ ' A' : '—' }}</dd></div>
+        <div class="col-6 col-sm-4"><dt>Temperature</dt><dd>{{ status and not stale ? status.temperature.tC|number_format(1) ~ ' °C' : '—' }}</dd></div>
+        <div class="col-6 col-sm-4"><dt>Total energy</dt><dd>{{ status and not stale ? (status.aenergy.total / 1000)|number_format(3) ~ ' kWh' : '—' }}</dd></div>
+        <div class="col-6 col-sm-4"><dt>Switch</dt><dd>{{ status and not stale ? (status.output ? 'On' : 'Off') : '—' }}</dd></div>
+        <div class="col-6 col-sm-4"><dt>Last checked (UTC)</dt><dd>{{ plug.checkedAt ? plug.checkedAt|date('H:i:s', 'UTC') : '—' }}</dd></div>
+    </dl>
+</article>

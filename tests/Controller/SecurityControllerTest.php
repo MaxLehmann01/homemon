@@ -9,7 +9,7 @@ final class SecurityControllerTest extends WebTestCase
     public function testDashboardAndLiveEndpointsRequireAuthentication(): void
     {
         $client = static::createClient();
-        foreach (['/', '/plugs/neu', '/_components/PlugCard'] as $path) {
+        foreach (['/', '/_components/PlugDashboard', '/_components/PlugCard'] as $path) {
             $client->request('GET', $path);
             self::assertResponseRedirects('/login');
         }

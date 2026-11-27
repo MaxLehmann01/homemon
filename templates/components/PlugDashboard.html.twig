@@ -1,0 +1,54 @@
+<div {{ attributes }}>
+    <header class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+        <div>
+            <p class="eyebrow mb-2">Your home, in real time</p>
+            <h1 class="display-6 fw-semibold mb-2">Energy dashboard</h1>
+            <p class="text-secondary mb-0">A live view of your plugs. Updated every second.</p>
+        </div>
+        <button class="btn btn-primary px-4" data-action="live#action" data-live-action-param="add">Add Plug</button>
+    </header>
+
+    {% if notice %}<div class="alert alert-success" role="status">{{ notice }}</div>{% endif %}
+
+    {% if showForm %}
+        <section class="plug-card rounded-4 p-4 mb-4" aria-labelledby="plug-form-heading">
+            <h2 class="h5" id="plug-form-heading">{{ editingId ? 'Edit plug' : 'Add Plug' }}</h2>
+            {{ form_start(form, {attr: {class: 'plug-form', 'data-action': 'live#action:prevent', 'data-live-action-param': 'save', 'data-model': 'norender|*'}}) }}
+                <div class="row g-3">
+                    <div class="col-md-5">{{ form_row(form.name) }}</div>
+                    <div class="col-md-7">{{ form_row(form.hostname) }}</div>
+                </div>
+                <div class="d-flex gap-2 mt-3">
+                    {{ form_widget(form.save) }}
+                    <button class="btn btn-light" type="button" data-action="live#action" data-live-action-param="cancel">Cancel</button>
+                </div>
+            {{ form_end(form) }}
+        </section>
+    {% endif %}
+
+    {% set plugs = this.plugs %}
+    {% if plugs is empty %}
+        <section class="empty-state text-center p-5 rounded-4">
+            <div class="plug-icon mx-auto mb-3" aria-hidden="true">⌁</div>
+            <h2 class="h5">No plugs yet</h2>
+            <p class="text-secondary mb-0">Click Add Plug to start monitoring your first device.</p>
+        </section>
+    {% else %}
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h6 text-secondary mb-0">Connected devices</h2>
+            <span class="badge text-bg-light">{{ plugs|length }} {{ plugs|length == 1 ? 'plug' : 'plugs' }}</span>
+        </div>
+        <div class="row g-4">
+            {% for plug in plugs %}
+                <div class="col-12 col-xl-6" id="plug-{{ plug.id }}">
+                    {{ component('PlugCard', {plug: plug, key: 'plug-' ~ plug.id}) }}
+                    <div class="d-flex gap-3 px-3 pt-2">
+                        <button class="btn btn-sm btn-link p-0 text-decoration-none" data-action="live#action" data-live-action-param="edit" data-live-id-param="{{ plug.id }}">Edit</button>
+                        <button class="btn btn-sm btn-link text-danger p-0 text-decoration-none" data-action="live#action" data-live-action-param="delete" data-live-id-param="{{ plug.id }}">Delete</button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <p class="small text-secondary mt-4">Power history · Last 5 minutes · 1-second sampling · All times UTC</p>
+</div>

@@ -50,3 +50,10 @@ body {
 .back-link:hover {
     color: var(--bs-primary);
 }
+
+.brand { color: #202a3a; font-weight: 750; font-size: 1.4rem; }
+.eyebrow { color: #4f62d8; font-weight: 650; font-size: .75rem; text-transform: uppercase; letter-spacing: .12em; }
+.power-value { font-size: 2.5rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+.power-chart { height: 230px; position: relative; }
+.metrics dt { color: #6c757d; font-weight: 400; }
+.metrics dd { margin-top: .25rem; font-weight: 600; }
